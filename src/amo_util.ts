@@ -1,12 +1,42 @@
 import * as https from 'node:https'
 import fs from 'node:fs'
 import { CONFIG_AMO } from './server_config.js'
-import amo_token_access from './amo_token_access.json' assert { type: 'json' }
-import amo_token_refresh from './amo_token_refresh.json' assert { type: 'json' }
-import { domainUtil } from './domain.js'
+// import amo_token_access from './amo_token_access.json' assert { type: 'json' }
+// import amo_token_refresh from './amo_token_refresh.json' assert { type: 'json' }
+import { DomainSchemaT, domainUtil } from './domain.js'
 import { amoApiAccessTokenDomSchema, amoContactDomSchema, AmoContactT, amoCustomFieldDomSchema, AmoCustomFieldT, amoLeadDomSchema, AmoLeadT, amoLinkDomSchema, AmoLinkT, amoStatusDomSchema, AmoStatusT, amoUserDomSchema, AmoUserT } from './db_interface.js'
 
+type AmoTokenAccessInterfaceT = {
+  expires: string
+  access_token: string
+}
+
+type AmoTokenRefreshInterfaceT = {
+  incorrect_token_flag: boolean
+  refresh_token: string
+}
+
+const amoTokenAccessDomSchema: DomainSchemaT<AmoTokenAccessInterfaceT> = {
+  expires: { type: 'string' },
+  access_token: { type: 'string' },
+}
+
+const amoTokenRefreshDomSchema: DomainSchemaT<AmoTokenRefreshInterfaceT> = {
+  incorrect_token_flag: { type: 'boolean' },
+  refresh_token: { type: 'string' },
+}
+
 let lastSyncTimer = 0
+
+const amoTokenAccessPath = './src/amo_token_access.json'
+const amoTokenRefreshPath = './src/amo_token_refresh.json'
+const authorizationLogPath = 'authorization_log.txt'
+
+const amoTokenAccessUntyped: unknown = JSON.parse(fs.readFileSync(amoTokenAccessPath, 'utf8'))
+const amoTokenRefreshUntyped: unknown = JSON.parse(fs.readFileSync(amoTokenRefreshPath, 'utf8'))
+
+const amo_token_access = domainUtil.typifyDocument(amoTokenAccessUntyped, amoTokenAccessDomSchema)
+const amo_token_refresh = domainUtil.typifyDocument(amoTokenRefreshUntyped, amoTokenRefreshDomSchema)
 
 export const amoUtil = {
   async getLeadQuery(query: string) {
@@ -36,8 +66,8 @@ export const amoUtil = {
     })
     const result = await sendReq({ path, method, data })
 
-    fs.appendFileSync('authorization_log.txt', `\n${path}\n${new Date().toISOString()}\n`)
-    fs.appendFileSync('authorization_log.txt', JSON.stringify(result))
+    fs.appendFileSync(authorizationLogPath, `\n${path}\n${new Date().toISOString()}\n`, 'utf8')
+    fs.appendFileSync(authorizationLogPath, JSON.stringify(result), 'utf8')
 
     if (!domainUtil.isDocument(result, amoApiAccessTokenDomSchema)) {
       console.error('\nRESULT OF REFRESH TOKEN REQUEST:\n', result)
@@ -48,9 +78,9 @@ export const amoUtil = {
     amo_token_access.expires = new Date(Date.now() + result.expires_in * 1000).toISOString()
     amo_token_refresh.refresh_token = result.refresh_token
 
-    fs.writeFileSync('./src/amo_token_access.json', JSON.stringify(amo_token_access))
+    fs.writeFileSync(amoTokenAccessPath, JSON.stringify(amo_token_access), 'utf8')
     // fs.writeFileSync('./lib/amo_token_access.json', JSON.stringify(amo_token_access))
-    fs.writeFileSync('./src/amo_token_refresh.json', JSON.stringify(amo_token_refresh))
+    fs.writeFileSync(amoTokenRefreshPath, JSON.stringify(amo_token_refresh), 'utf8')
     // fs.writeFileSync('./lib/amo_token_refresh.json', JSON.stringify(amo_token_refresh))
   },
 
@@ -230,7 +260,7 @@ async function sendReq({
   if (parsedResult?.status !== 401) return parsedResult
 
   amo_token_refresh.incorrect_token_flag = true
-  fs.writeFileSync('./src/amo_token_refresh.json', JSON.stringify(amo_token_refresh))
+  fs.writeFileSync(amoTokenRefreshPath, JSON.stringify(amo_token_refresh), 'utf8')
   // fs.writeFileSync('./lib/amo_token_refresh.json', JSON.stringify(amo_token_refresh))
   throw new Error('After authorization error we tried to refresh token but failed. Reset incorrect_token_flag manually.')
 }

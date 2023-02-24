@@ -2,6 +2,7 @@ import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module.js'
 import { dbUtil } from './db_util.js'
+import { CONFIG_OTHER } from './server_config.js'
 import { util } from './util.js'
 
 async function bootstrap() {
@@ -17,7 +18,7 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type']
   })
-  await app.listen(3000)
+  await app.listen(CONFIG_OTHER.port)
   console.log(`Application is running on: ${await app.getUrl()}`)
 }
 bootstrap()

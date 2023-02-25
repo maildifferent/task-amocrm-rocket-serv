@@ -15,7 +15,7 @@ export class TaskService {
       await util.getDataDeltaAndUpdateTables()
       // this.logger.debug('Data synced (every 5 mins).')
     } catch (error) {
-      console.error(error.message)
+      console.error(error)
     }
   }
 }

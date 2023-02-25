@@ -20,7 +20,7 @@ export class LeadController {
         return await this.leadService.read()
       }
     } catch (error) {
-      console.error(error.message)
+      console.error(error)
     }
   }
 

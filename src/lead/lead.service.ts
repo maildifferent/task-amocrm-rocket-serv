@@ -25,7 +25,6 @@ export class LeadService {
         responsible_user: responsible_user.rows
       }
     } catch (error) {
-      console.log(error)
       throw error
     } finally {
       client.release()

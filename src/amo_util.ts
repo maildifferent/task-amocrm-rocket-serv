@@ -28,9 +28,9 @@ const amoTokenRefreshDomSchema: DomainSchemaT<AmoTokenRefreshInterfaceT> = {
 
 let lastSyncTimer = 0
 
-const amoTokenAccessPath = './src/amo_token_access.json'
-const amoTokenRefreshPath = './src/amo_token_refresh.json'
-const authorizationLogPath = 'authorization_log.txt'
+const amoTokenAccessPath = CONFIG_AMO.token_path + '/amo_token_access.json'
+const amoTokenRefreshPath = CONFIG_AMO.token_path + '/amo_token_refresh.json'
+const authorizationLogPath = './etc/log/authorization_log.txt'
 
 const amoTokenAccessUntyped: unknown = JSON.parse(fs.readFileSync(amoTokenAccessPath, 'utf8'))
 const amoTokenRefreshUntyped: unknown = JSON.parse(fs.readFileSync(amoTokenRefreshPath, 'utf8'))
@@ -79,21 +79,19 @@ export const amoUtil = {
     amo_token_refresh.refresh_token = result.refresh_token
 
     fs.writeFileSync(amoTokenAccessPath, JSON.stringify(amo_token_access), 'utf8')
-    // fs.writeFileSync('./lib/amo_token_access.json', JSON.stringify(amo_token_access))
     fs.writeFileSync(amoTokenRefreshPath, JSON.stringify(amo_token_refresh), 'utf8')
-    // fs.writeFileSync('./lib/amo_token_refresh.json', JSON.stringify(amo_token_refresh))
   },
 
-  // async getAuthorizationCode() {
-  //   const path = '/oauth2/access_token'
-  //   const method = 'POST'
-  //   const { client_id, client_secret, code, redirect_uri } = CONFIG_AMO
-  //   const data = JSON.stringify({
-  //     client_id, client_secret, grant_type: 'authorization_code', code, redirect_uri
-  //   })
-  //   const result = await sendReq({ path, method, data })
-  //   console.log('RESULT:\n', result)
-  // },
+  async _getAuthorizationCode() {
+    const path = '/oauth2/access_token'
+    const method = 'POST'
+    const { client_id, client_secret, code, redirect_uri } = CONFIG_AMO
+    const data = JSON.stringify({
+      client_id, client_secret, grant_type: 'authorization_code', code, redirect_uri
+    })
+    const result = await sendReq({ path, method, data })
+    console.log('RESULT:\n', result)
+  },
 }
 
 const utilPrivate = {
@@ -261,7 +259,6 @@ async function sendReq({
 
   amo_token_refresh.incorrect_token_flag = true
   fs.writeFileSync(amoTokenRefreshPath, JSON.stringify(amo_token_refresh), 'utf8')
-  // fs.writeFileSync('./lib/amo_token_refresh.json', JSON.stringify(amo_token_refresh))
   throw new Error('After authorization error we tried to refresh token but failed. Reset incorrect_token_flag manually.')
 }
 

@@ -11,7 +11,11 @@ export class TaskService {
   // @Cron('*/1 * * * *') // Every 1 min.
   // @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
-    await util.getDataDeltaAndUpdateTables()
-    // this.logger.debug('Data synced (every 5 mins).')
+    try {
+      await util.getDataDeltaAndUpdateTables()
+      // this.logger.debug('Data synced (every 5 mins).')
+    } catch (error) {
+      console.error(error.message)
+    }
   }
 }

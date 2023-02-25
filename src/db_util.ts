@@ -25,8 +25,8 @@ pgPool.on('error', (err, client) => {
 
 export const dbUtil = {
   async recreateTables() {
-    await processSqlFile('db_tabs_drop.sql')
-    await processSqlFile('db_tabs_create.sql')
+    await processSqlFile('./etc/sql/db_tabs_drop.sql')
+    await processSqlFile('./etc/sql/db_tabs_create.sql')
   },
 
   async upsert(items: {

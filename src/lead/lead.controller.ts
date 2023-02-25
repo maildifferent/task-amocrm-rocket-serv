@@ -9,14 +9,18 @@ export class LeadController {
 
   @Get()
   async read(@Query() q: { query: unknown }): Promise<{ leadIds: number[] } | LeadReadI> {
-    if (q.query !== undefined) {
-      let query = ''
-      if (typeof q.query === 'string') query = q.query
-      const { leads } = await amoUtil.getLeadQuery(query)
-      const leadIds = leads.map((lead) => lead.id)
-      return { leadIds }
-    } else {
-      return await this.leadService.read()
+    try {
+      if (q.query !== undefined) {
+        let query = ''
+        if (typeof q.query === 'string') query = q.query
+        const { leads } = await amoUtil.getLeadQuery(query)
+        const leadIds = leads.map((lead) => lead.id)
+        return { leadIds }
+      } else {
+        return await this.leadService.read()
+      }
+    } catch (error) {
+      console.error(error.message)
     }
   }
 

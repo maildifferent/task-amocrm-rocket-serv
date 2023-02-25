@@ -35,7 +35,7 @@ export const CONFIG_AMO: ConfigAmoI = process.env['IS_PRODUCTION']
   client_secret: 'OYViFBKEw0eRzME7tGCGQ13YkwWUxWTeeJF5jH5ZYELOFfJmier4LbsYb1UPwNFf',
   code: 'def502005dd89c962f0b48aeb0cc84c27da78ad4861124c7f0095148ddc3133dfc259f8ab7bb13a5910e2710a472c1c19c14fa37eda356ff8be2a594ae5a22add8f83ec01d27bc6dd6e10de51797c863a120105953b44d7727b60195bbf280960faf0785e4aff78f9c89922da8b54346d28f2564fe600e06663a0c6867f8bef4c098b9396eec6276b583bd730447df01043b88fa1f8e5bd00b3a39a868555bf8c41cf03f055f401d36f990cad27d71ea2e8ac91aa415c384d7ba1380a4f8da68da28f7dd0c75fc5e99f970822fa99b324f81c91cc6b9c684edf4b4ea73638812c70da8c4b13f8af68e11e631445f9a940d2e0a7f2af89f4e70069c6edf4b798af5a0116ffd68f53697f19fd237efe17d42a29c9aafc16255dbf0ba82442e4253e0d6c586ebf5c7c1b2245aab6edbbcb4b645372b55013b30f4f1206433993ca0d1e6eb4b6154ae56369c2fc226e7e12bbd4321e6f4ce59e04be8521f0644c4a5aa80585ed017bbaf40a9b48f907887a587f59028c4e14d7eab30fc4588f7d3cffd7b93872b792563dc4cc6ffaff5923a1a44b3a66c4e38554296c63c60c840acf8e6306335b1a6d0f101d0ffe51a9a959d89cc6f571b8edbe11e4e623b0f4e9b9db063ac1a7157bcbc6675bd3b816078af8406c51a14363f4aeb096d6e7e870567681590be9ec06c40597c5142',
   redirect_uri: 'https://task-amocrm-rocket-serv.onrender.com',
-  token_path: './etc/secrets',
+  token_path: '/etc/secrets',
 } as const)
 // Для локального запуска, например, из VS Code, надо заполнить только эту
 // часть конфига.
@@ -47,7 +47,6 @@ export const CONFIG_AMO: ConfigAmoI = process.env['IS_PRODUCTION']
   redirect_uri: 'https://task-amocrm-rocket-serv.onrender.com',
   token_path: './etc/secrets_dev',
 } as const)
-console.log(CONFIG_AMO)
 
 export const CONFIG_OTHER = Object.freeze({
   port: process.env['PORT'] || 3000

@@ -68,6 +68,8 @@ export const amoUtil = {
 
     fs.appendFileSync(authorizationLogPath, `\n${path}\n${new Date().toISOString()}\n`, 'utf8')
     fs.appendFileSync(authorizationLogPath, JSON.stringify(result), 'utf8')
+    console.log(`Append to file ${authorizationLogPath} the following data:\n`, JSON.stringify(result))
+    console.log(`Result:\n`, fs.readFileSync(authorizationLogPath, 'utf8'))
 
     if (!domainUtil.isDocument(result, amoApiAccessTokenDomSchema)) {
       console.error('\nRESULT OF REFRESH TOKEN REQUEST:\n', result)
@@ -79,7 +81,11 @@ export const amoUtil = {
     amo_token_refresh.refresh_token = result.refresh_token
 
     fs.writeFileSync(amoTokenAccessPath, JSON.stringify(amo_token_access), 'utf8')
+    console.log(`Write to file ${amoTokenAccessPath} the following data:\n`, JSON.stringify(amo_token_access))
+    console.log(`Result:\n`, fs.readFileSync(amoTokenAccessPath, 'utf8'))
     fs.writeFileSync(amoTokenRefreshPath, JSON.stringify(amo_token_refresh), 'utf8')
+    console.log(`Write to file ${amoTokenRefreshPath} the following data:\n`, JSON.stringify(amo_token_refresh))
+    console.log(`Result:\n`, fs.readFileSync(amoTokenRefreshPath, 'utf8'))
   },
 
   async _getAuthorizationCode() {
@@ -259,6 +265,8 @@ async function sendReq({
 
   amo_token_refresh.incorrect_token_flag = true
   fs.writeFileSync(amoTokenRefreshPath, JSON.stringify(amo_token_refresh), 'utf8')
+  console.log(`Write to file ${amoTokenRefreshPath} the following data:\n`, JSON.stringify(amo_token_refresh))
+  console.log(`Result:\n`, fs.readFileSync(amoTokenRefreshPath, 'utf8'))
   throw new Error('After authorization error we tried to refresh token but failed. Reset incorrect_token_flag manually.')
 }
 

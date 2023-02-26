@@ -3,21 +3,21 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module.js'
 import { dbUtil } from './db_util.js'
 import { CONFIG_OTHER } from './server_config.js'
-import { dataDeltaUtil } from './data_delta_util.js'
+import { dataUtil } from './data_util.js'
 
 async function bootstrap() {
   const logger = new Logger('bootstrap')
 
   try {
     debugger
-    const dataDelta = await dataDeltaUtil.get()
+    const dataDelta = await dataUtil.getAllFromAmo()
     if (privateUtil.isEmptyArraysObject(dataDelta)) {
       logger.debug('No initial data received.')
     } else {
       logger.debug('Initial data is received.')
       await dbUtil.recreateTables()
       logger.debug('Tables recreated.')
-      await dataDeltaUtil.updateTables(dataDelta)
+      await dataUtil.updateTables(dataDelta)
       logger.debug('Initial data is inserted into tables.')
     }
   } catch (error) {

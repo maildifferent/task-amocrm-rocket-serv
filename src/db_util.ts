@@ -1,7 +1,7 @@
 import pg from 'pg'
 import { CONFIG_LOCAL_DB } from './server_config.js'
 import fs from 'fs'
-import { DomainSchemaT } from './domain.js'
+import { DomainSchemaT, domainUtil } from './domain.js'
 
 export const pgPool = process.env['DATABASE_URL']
   ? new pg.Pool({
@@ -23,10 +23,49 @@ pgPool.on('error', (err, client) => {
   process.exit(-1)
 })
 
+
+export type DbUtilDomSchemaCollectionT<TypeCollection> = {
+  [key in keyof TypeCollection]: DomainSchemaT<TypeCollection[key]>
+}
+
+export type DbUtilArrayCollectionT<TypeCollection> = {
+  [key in keyof TypeCollection]: TypeCollection[key][]
+}
+
 export const dbUtil = {
   async recreateTables() {
     await processSqlFile('./etc/sql/db_tabs_drop.sql')
     await processSqlFile('./etc/sql/db_tabs_create.sql')
+  },
+
+  async read<TypeCollection>(
+    domSchemaCollection: DbUtilDomSchemaCollectionT<TypeCollection>
+  ): Promise<DbUtilArrayCollectionT<TypeCollection>> {
+    const client = await pgPool.connect()
+    try {
+      const partialResult: Partial<DbUtilArrayCollectionT<TypeCollection>> = {}
+
+      for (const tableName in domSchemaCollection) {
+        const domSchema = domSchemaCollection[tableName]
+        const tabQueryRes = await client.query<unknown>(`SELECT * FROM ${tableName}`)
+        const rows = tabQueryRes.rows
+        if(!domainUtil.isDocumentArray(rows, domSchema)) throw new Error('!domainUtil.isDocumentArray(rows, domSchema)')
+        partialResult[tableName] = rows
+      }
+
+      if (!isFullArraysCollection(partialResult)) throw new Error('!isFullArraysCollection(partialResult)')
+      return partialResult
+    } catch (error) {
+      throw error
+    } finally {
+      client.release()
+    }
+
+    function isFullArraysCollection(
+      partial: Partial<DbUtilArrayCollectionT<TypeCollection>>
+    ): partial is DbUtilArrayCollectionT<TypeCollection> {
+      return Object.keys(partial).length === Object.keys(domSchemaCollection).length
+    }
   },
 
   async upsert(items: {

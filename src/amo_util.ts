@@ -82,28 +82,28 @@ export const amoUtil = {
     console.log('RESULT:\n', result)
   },
 
-  async getUser(): Promise<{ users: AmoUserT[] }> {
-    const users: AmoUserT[] = []
+  async getUser(): Promise<{ responsible_user: AmoUserT[] }> {
+    const responsible_user: AmoUserT[] = []
     const path = `/api/v4/users`
     const method = 'GET'
 
     const parsedResult = await sendReq({ path, method })
-    if (parsedResult === '') return { users }
+    if (parsedResult === '') return { responsible_user }
     const embedded: unknown = parsedResult?._embedded?.users
     if (!Array.isArray(embedded)) throw new Error('!Array.isArray(embedded)')
-    users.push(...domainUtil.typifyDocumentArray(embedded, amoUserDomSchema))
+    responsible_user.push(...domainUtil.typifyDocumentArray(embedded, amoUserDomSchema))
 
-    return { users }
+    return { responsible_user }
   },
 
-  async getPipeline(): Promise<{ statuses: AmoStatusT[] }> {
-    const statuses: AmoStatusT[] = []
+  async getPipeline(): Promise<{ pipeline_status: AmoStatusT[] }> {
+    const pipeline_status: AmoStatusT[] = []
     // const path = `/api/v4/leads/pipelines/6428286`
     const path = `/api/v4/leads/pipelines`
     const method = 'GET'
 
     const parsedResult = await sendReq({ path, method })
-    if (parsedResult === '') return { statuses }
+    if (parsedResult === '') return { pipeline_status }
     const pipelines: unknown = parsedResult?._embedded?.pipelines
     if (!Array.isArray(pipelines)) throw new Error('!Array.isArray(pipelines)')
 
@@ -112,16 +112,16 @@ export const amoUtil = {
       if (!Array.isArray(embedded)) throw new Error('!Array.isArray(embedded)')
       const typedResult: AmoStatusT[] = domainUtil.typifyDocumentArray(embedded, amoStatusDomSchema)
       for (const status of typedResult) {
-        if (!statuses.find((element) => element.id === status.id)) statuses.push(status)
+        if (!pipeline_status.find((element) => element.id === status.id)) pipeline_status.push(status)
       }
     }
 
-    return { statuses }
+    return { pipeline_status }
   },
 
-  async getLink(leadIds: number[]): Promise<{ links: AmoLinkT[] }> {
-    const links: AmoLinkT[] = []
-    if (leadIds.length < 1) return { links }
+  async getLink(leadIds: number[]): Promise<{ entity_link: AmoLinkT[] }> {
+    const entity_link: AmoLinkT[] = []
+    if (leadIds.length < 1) return { entity_link }
     // const path = '/api/v4/leads/239529/links'
     // const path = '/api/v4/contacts/352919/links'
     // https://www.amocrm.ru/developers/content/crm_platform/filters-api
@@ -132,23 +132,25 @@ export const amoUtil = {
     const method = 'GET'
 
     const parsedResult = await sendReq({ path, method })
-    if (parsedResult === '') return { links }
+    if (parsedResult === '') return { entity_link }
     const embedded: unknown = parsedResult?._embedded?.links
     if (!Array.isArray(embedded)) throw new Error('!Array.isArray(embedded)')
-    links.push(...domainUtil.typifyDocumentArray(embedded, amoLinkDomSchema))
+    entity_link.push(...domainUtil.typifyDocumentArray(embedded, amoLinkDomSchema))
 
-    return { links }
+    return { entity_link }
   },
 
-  async getContact(updatedAtFrom?: number): Promise<{ contacts: AmoContactT[], customFields: AmoCustomFieldT[] }> {
-    const contacts: AmoContactT[] = []
-    const customFields: AmoCustomFieldT[] = []
+  async getContact(updatedAtFrom?: number): Promise<{
+    amo_contact: AmoContactT[], contact_custom_field: AmoCustomFieldT[]
+  }> {
+    const amo_contact: AmoContactT[] = []
+    const contact_custom_field: AmoCustomFieldT[] = []
     let path = '/api/v4/contacts'
     if (updatedAtFrom) path += `?filter[updated_at][from]=${updatedAtFrom}`
     const method = 'GET'
 
     const parsedResult = await sendReq({ path, method })
-    if (parsedResult === '') return { contacts, customFields }
+    if (parsedResult === '') return { amo_contact, contact_custom_field }
     const embedded: unknown = parsedResult?._embedded?.contacts
     if (!Array.isArray(embedded)) throw new Error('!Array.isArray(embedded)')
 
@@ -161,7 +163,7 @@ export const amoUtil = {
         responsible_user_id: domainUtil.typifyPrimitiveType(item?.responsible_user_id, amoContactDomSchema['responsible_user_id']),
         updated_at: domainUtil.typifyPrimitiveType(item?.updated_at, amoContactDomSchema['updated_at']),
       }
-      contacts.push(contact)
+      amo_contact.push(contact)
 
       const customFVals = item?.custom_fields_values
       if (!Array.isArray(customFVals)) continue
@@ -189,7 +191,7 @@ export const amoUtil = {
         }
 
         for (const [key, values] of Object.entries(record)) {
-          customFields.push({
+          contact_custom_field.push({
             zz_contact_id: customField.zz_contact_id,
             zz_field_code1: customField.zz_field_code1,
             zz_field_code2: key,
@@ -200,13 +202,13 @@ export const amoUtil = {
       }
     }
 
-    return { contacts, customFields }
+    return { amo_contact, contact_custom_field }
   },
 
   async getLead(
     { updatedAtFrom, query }: { updatedAtFrom?: number, query?: string }
-  ): Promise<{ leads: AmoLeadT[] }> {
-    const leads: AmoLeadT[] = []
+  ): Promise<{ amo_lead: AmoLeadT[] }> {
+    const amo_lead: AmoLeadT[] = []
     // const path = '/api/v4/leads/239529'
     let path = '/api/v4/leads'
     const params: string[] = []
@@ -219,12 +221,12 @@ export const amoUtil = {
     const method = 'GET'
 
     const parsedResult = await sendReq({ path, method })
-    if (parsedResult === '') return { leads }
+    if (parsedResult === '') return { amo_lead }
     const embedded: unknown = parsedResult?._embedded?.leads
     if (!Array.isArray(embedded)) throw new Error('!Array.isArray(embedded)')
-    leads.push(...domainUtil.typifyDocumentArray(embedded, amoLeadDomSchema))
+    amo_lead.push(...domainUtil.typifyDocumentArray(embedded, amoLeadDomSchema))
 
-    return { leads }
+    return { amo_lead }
   },
 }
 

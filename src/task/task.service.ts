@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { Cron, CronExpression, Interval, Timeout } from '@nestjs/schedule'
-import { util } from '../util.js'
+import { dataDeltaUtil } from '../data_delta_util.js'
 
 @Injectable()
 export class TaskService {
@@ -12,7 +12,7 @@ export class TaskService {
   // @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCron() {
     try {
-      await util.getDataDeltaAndUpdateTables()
+      await dataDeltaUtil.getAndUpdateTables()
       // this.logger.debug('Data synced (every 5 mins).')
     } catch (error) {
       console.error(error)

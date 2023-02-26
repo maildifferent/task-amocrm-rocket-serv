@@ -13,7 +13,7 @@ export class LeadController {
       if (q.query !== undefined) {
         let query = ''
         if (typeof q.query === 'string') query = q.query
-        const { leads } = await amoUtil.getLeadQuery(query)
+        const { leads } = await amoUtil.getLead({ query })
         const leadIds = leads.map((lead) => lead.id)
         return { leadIds }
       } else {

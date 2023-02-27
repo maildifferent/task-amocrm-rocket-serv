@@ -24,12 +24,12 @@ pgPool.on('error', (err, client) => {
 })
 
 
-export type DbUtilDomSchemaCollectionT<TypeCollection> = {
-  [key in keyof TypeCollection]: DomainSchemaT<TypeCollection[key]>
+export type DbUtilDomSchemaCollectionT<TableRowTypeCollection> = {
+  [key in keyof TableRowTypeCollection]: DomainSchemaT<TableRowTypeCollection[key]>
 }
 
-export type DbUtilArrayCollectionT<TypeCollection> = {
-  [key in keyof TypeCollection]: TypeCollection[key][]
+export type DbUtilArrayCollectionT<TableRowTypeCollection> = {
+  [key in keyof TableRowTypeCollection]: TableRowTypeCollection[key][]
 }
 
 export const dbUtil = {
@@ -38,12 +38,12 @@ export const dbUtil = {
     await processSqlFile('./etc/sql/db_tabs_create.sql')
   },
 
-  async read<TypeCollection>(
-    domSchemaCollection: DbUtilDomSchemaCollectionT<TypeCollection>
-  ): Promise<DbUtilArrayCollectionT<TypeCollection>> {
+  async read<TableRowTypeCollection>(
+    domSchemaCollection: DbUtilDomSchemaCollectionT<TableRowTypeCollection>
+  ): Promise<DbUtilArrayCollectionT<TableRowTypeCollection>> {
     const client = await pgPool.connect()
     try {
-      const partialResult: Partial<DbUtilArrayCollectionT<TypeCollection>> = {}
+      const partialResult: Partial<DbUtilArrayCollectionT<TableRowTypeCollection>> = {}
 
       for (const tableName in domSchemaCollection) {
         const domSchema = domSchemaCollection[tableName]
@@ -53,7 +53,7 @@ export const dbUtil = {
         partialResult[tableName] = rows
       }
 
-      if (!isFullArraysCollection(partialResult)) throw new Error('!isFullArraysCollection(partialResult)')
+      if (!isFullArrayCollection(partialResult)) throw new Error('!isFullArrayCollection(partialResult)')
       return partialResult
     } catch (error) {
       throw error
@@ -61,9 +61,9 @@ export const dbUtil = {
       client.release()
     }
 
-    function isFullArraysCollection(
-      partial: Partial<DbUtilArrayCollectionT<TypeCollection>>
-    ): partial is DbUtilArrayCollectionT<TypeCollection> {
+    function isFullArrayCollection(
+      partial: Partial<DbUtilArrayCollectionT<TableRowTypeCollection>>
+    ): partial is DbUtilArrayCollectionT<TableRowTypeCollection> {
       return Object.keys(partial).length === Object.keys(domSchemaCollection).length
     }
   },

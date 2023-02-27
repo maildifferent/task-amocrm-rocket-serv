@@ -46,3 +46,8 @@ CREATE TABLE responsible_user(
   id INTEGER PRIMARY KEY,
   name TEXT
 );
+
+CREATE TABLE IF NOT EXISTS file_storage(
+  file_name TEXT PRIMARY KEY,
+  text_content TEXT
+);

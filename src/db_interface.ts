@@ -105,3 +105,17 @@ export const amoUserDomSchema: DomainSchemaT<AmoUserT> = {
   id: { type: 'number', key: true },
   name: { type: 'string' },
 }
+
+export type TabFileStorageT = {
+  file_name: string
+  text_content: string
+}
+
+export type TabFileStorageRowTypeT = {
+  file_storage: TabFileStorageT
+}
+
+export const tabFileStorageDomSchema: DomainSchemaT<TabFileStorageT> = {
+  file_name: { type: 'string', key: true },
+  text_content: { type: 'string' }
+}

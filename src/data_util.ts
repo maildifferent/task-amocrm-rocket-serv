@@ -2,7 +2,7 @@ import { amoUtil } from './amo_util.js'
 import { amoContactDomSchema, AmoContactT, amoCustomFieldDomSchema, AmoCustomFieldT, amoLeadDomSchema, AmoLeadT, amoLinkDomSchema, AmoLinkT, amoStatusDomSchema, AmoStatusT, amoUserDomSchema, AmoUserT } from './db_interface.js'
 import { dbUtil, DbUtilArrayCollectionT, DbUtilDomSchemaCollectionT } from './db_util.js'
 
-type TypeCollectionT = {
+type TableRowTypeCollectionT = {
   amo_lead: AmoLeadT
   entity_link: AmoLinkT
   amo_contact: AmoContactT
@@ -11,8 +11,8 @@ type TypeCollectionT = {
   responsible_user: AmoUserT
 }
 
-export type DataDeltaI = DbUtilArrayCollectionT<TypeCollectionT>
-// {
+export type DataDeltaI = DbUtilArrayCollectionT<TableRowTypeCollectionT>
+// = {
 //   amo_contact: AmoContactT[]
 //   contact_custom_field: AmoCustomFieldT[]
 //   amo_lead: AmoLeadT[]
@@ -21,7 +21,7 @@ export type DataDeltaI = DbUtilArrayCollectionT<TypeCollectionT>
 //   responsible_user: AmoUserT[]
 // }
 
-const domSchemaCollection: DbUtilDomSchemaCollectionT<TypeCollectionT> = {
+const domSchemaCollection: DbUtilDomSchemaCollectionT<TableRowTypeCollectionT> = {
   amo_lead: amoLeadDomSchema,
   entity_link: amoLinkDomSchema,
   amo_contact: amoContactDomSchema,

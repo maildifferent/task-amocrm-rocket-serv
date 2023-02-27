@@ -82,9 +82,12 @@ export async function amoTokenSave(): Promise<void> {
     console.log(`\nResult of saving token to file ${amoTokenPath}:\n`, fs.readFileSync(amoTokenPath, 'utf8'), '\n')
   } else if (amoTokenSource === 'DB') {
     await dbUtil.upsert([{
-      tabName: 'file_storage', domSchema: amoTokenExtendedDomainSchema, docs: [{ ...amoToken }]
+      tabName: 'file_storage', domSchema: tabFileStorageDomSchema, docs: [{
+        file_name: tokenFileName,
+        text_content: JSON.stringify(amoToken)
+      }]
     }])
-    console.log('\nToken saved to DB.\n')
+    console.log('\nQuery to save token to DB processed.\n')
   } else {
     throw new Error('Incorrect amoTokenSource.')
   }

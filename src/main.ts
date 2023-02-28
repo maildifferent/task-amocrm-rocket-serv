@@ -6,6 +6,9 @@ import { CONFIG_OTHER } from './server_config.js'
 import { dataUtil } from './data_util.js'
 
 async function bootstrap() {
+  console.log('process.env[TEST]: ', process.env['TEST'])
+  process.env['TEST'] = 'changed: ' + new Date().toISOString()
+
   const logger = new Logger('bootstrap')
 
   try {
